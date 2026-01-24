@@ -13,8 +13,8 @@ public class Simulator {
 		
 	static FileInputStream inputcodeStream = null;
 	/*
-		While we may only need 5 or 17 or 21 bits to encode certain part of the instruction, while writing the assembler
-		we can only have access to 32 bit integers. To get the bits we require, we use mask
+		While we may only need 5 or 17 or 22 bits at a time to encode certain part of the instruction,
+		however we only have access to 32 bit integers. To get the bits we require, we use masks
 
 		To get the first n least significant bits
 
@@ -24,7 +24,7 @@ public class Simulator {
 	private static int mask17 = (1<<17)-1;
 	private static int mask22 = (1<<22)-1;
 
-	// Each type of instruction is encoded through bitwise operations into a 32 bit instruction
+	// Each type of instruction is encoded through bitwise operations into a 32 bit number
 	private static int buildR3Instruction(int opCode, int src1, int src2, int rd){
 		opCode&=mask5;
 		src1&=mask5;
@@ -123,7 +123,7 @@ public class Simulator {
 					/*
 						Immediate is stored in source operand 2 for normal arithmetic instructions.
 						For branching instructions, it is stored in destination operand. Also, the immediate value
-						to encoded for branching instructions need to calculated with respect to the Program Counter
+						to be encoded for branching instructions need to calculated with respect to the Program Counter
 					*/
 
 					switch(inst.getOperationType()){
@@ -226,7 +226,7 @@ public class Simulator {
 					output.write(dataBuff);
 				}
 			}
-
+			// Close the file
 			output.close();
 
 			
