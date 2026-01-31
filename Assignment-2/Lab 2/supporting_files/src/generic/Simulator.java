@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-
+import generic.Instruction.OperationType;
 import generic.Operand.OperandType;
 
 
@@ -109,16 +109,39 @@ public class Simulator {
 
 
 					// If data is stored at a label, access it through the symbol table
-					if(inst.getSourceOperand2()!=null && (inst.getSourceOperand2().operandType==OperandType.Label)){
-						src2 = ParsedProgram.symtab.get(inst.getSourceOperand2().labelValue);
+					// Check if the register address provided is valid or not
+					if(inst.getSourceOperand2()!=null){
+						if(inst.getSourceOperand2().operandType==OperandType.Label){
+							src2 = ParsedProgram.symtab.get(inst.getSourceOperand2().labelValue);
+						}
+						if(inst.getSourceOperand2().operandType==OperandType.Register){
+							if(src2<0 || src2>31){
+								throw new IllegalArgumentException("Invalid register address");
+							}
+						}
 					}
-					if(inst.getSourceOperand1()!=null && (inst.getSourceOperand1().operandType==OperandType.Label)){
-						src1 = ParsedProgram.symtab.get(inst.getSourceOperand1().labelValue);
+					if(inst.getSourceOperand1()!=null){
+						if((inst.getSourceOperand1().operandType==OperandType.Label)){
+							src1 = ParsedProgram.symtab.get(inst.getSourceOperand1().labelValue);
+						}
+						if(inst.getSourceOperand1().operandType==OperandType.Register){
+							if(src1<0 || src1>31){
+								throw new IllegalArgumentException("Invalid register address");
+							}
+						}
 					
 					}
-					if(inst.getDestinationOperand()!=null && (inst.getDestinationOperand().operandType==OperandType.Label)){
-						rd = ParsedProgram.symtab.get(inst.getDestinationOperand().labelValue);
+					if(inst.getDestinationOperand()!=null){
+						if((inst.getDestinationOperand().operandType==OperandType.Label)){
+							rd = ParsedProgram.symtab.get(inst.getDestinationOperand().labelValue);
+						}
+						if((inst.getDestinationOperand().operandType==OperandType.Register)){
+							if(rd < 0 || rd >31){
+								throw new IllegalArgumentException("Invalid register address");
+							}
+						}
 					}
+					
 
 					/*
 						Immediate is stored in source operand 2 for normal arithmetic instructions.
@@ -127,100 +150,26 @@ public class Simulator {
 					*/
 
 					switch(inst.getOperationType()){
-						case add:
-							instructionCode = buildR3Instruction(0b00000, src1, src2, rd);
+						case add: case sub: case mul: case div: case and: case or: case xor: case slt:
+						case sll: case srl: case sra: 
+							instructionCode = buildR3Instruction(inst.getOperationType().ordinal(), src1, src2, rd);
 							break;
-						case addi:
-							instructionCode = buildR2IInstruction(0b00001, src1, rd, src2);
+						case addi: case subi: case muli: case divi: case andi: case ori: case xori: case slti:
+							case slli: case srli: case srai: case load: case store: 
+							instructionCode = buildR2IInstruction(inst.getOperationType().ordinal(), src1, rd, src2);
 							break;
-						case sub:
-							instructionCode = buildR3Instruction(0b00010, src1, src2, rd);
-							break;
-						case subi:
-							instructionCode = buildR2IInstruction(0b00011, src1, rd, src2);
-							break;
-						case mul:
-							instructionCode = buildR3Instruction(0b00100, src1, src2, rd);
-							break;
-						case muli:
-							instructionCode = buildR2IInstruction(0b00101, src1, rd, src2);
-							break;
-						case div:
-							instructionCode = buildR3Instruction(0b00110, src1, src2, rd);
-							break;
-						case divi:
-							instructionCode = buildR2IInstruction(0b00111, src1, rd, src2);
-							break;
-						case and:
-							instructionCode = buildR3Instruction(0b01000, src1, src2, rd);
-							break;
-						case andi:
-							instructionCode = buildR2IInstruction(0b01001, src1, rd, src2);
-							break;
-						case or:
-							instructionCode = buildR3Instruction(0b01010, src1, src2, rd);
-							break;
-						case ori:
-							instructionCode = buildR2IInstruction(0b01011, src1, rd, src2);
-							break;
-						case xor:
-							instructionCode = buildR3Instruction(0b01100, src1, src2, rd);
-							break;
-						case xori:
-							instructionCode = buildR2IInstruction(0b01101, src1, rd, src2);
-							break;
-						case slt:
-							instructionCode = buildR3Instruction(0b01110, src1, src2, rd);
-							break;
-						case slti:
-							instructionCode = buildR2IInstruction(0b01111, src1, rd, src2);
-							break;
-						case sll:
-							instructionCode = buildR3Instruction(0b10000, src1, src2, rd);
-							break;
-						case slli:
-							instructionCode = buildR2IInstruction(0b10001, src1, rd, src2);
-							break;
-						case srl:
-							instructionCode = buildR3Instruction(0b10010, src1, src2, rd);
-							break;
-						case srli:
-							instructionCode = buildR2IInstruction(0b10011, src1, rd, src2);
-							break;
-						case sra:
-							instructionCode = buildR3Instruction(0b10100, src1, src2, rd);
-							break;
-						case srai:
-							instructionCode = buildR2IInstruction(0b10101, src1, rd, src2);
-							break;
-						case load:
-							instructionCode = buildR2IInstruction(0b10110, src1, rd, src2);
-							break;
-						case store:
-							instructionCode = buildR2IInstruction(0b10111, src1, rd, src2);
-							break;
-						case jmp:
-							instructionCode = buildRIInstruction(0b11000, src1, rd-inst.getProgramCounter());
-							break;
-						case beq:
-							instructionCode = buildR2IInstruction(0b11001, src1, src2, rd-inst.getProgramCounter());
-							break;
-						case bne:
-							instructionCode = buildR2IInstruction(0b11010, src1, src2, rd-inst.getProgramCounter());
-							break;
-						case blt:
-							instructionCode = buildR2IInstruction(0b11011, src1, src2, rd-inst.getProgramCounter());
-							break;
-						case bgt:
-							instructionCode = buildR2IInstruction(0b11100, src1, src2, rd-inst.getProgramCounter());
+						case beq: case bne: case blt: case bgt: 
+							instructionCode = buildR2IInstruction(inst.getOperationType().ordinal(), src1, src2, rd-inst.getProgramCounter());
 							break;
 						case end:
-							instructionCode = buildRIInstruction(0b11101, rd, src2);
+							instructionCode = buildRIInstruction(inst.getOperationType().ordinal(), rd, src2);
+							break;
+						case jmp:
+							instructionCode = buildRIInstruction(inst.getOperationType().ordinal(), src1, rd-inst.getProgramCounter());
 							break;
 						default:
 							System.out.println(inst.toString());
 							throw new IllegalArgumentException("Invalid instruction");
-
 					}
 					byte[] dataBuff = ByteBuffer.allocate(4).putInt(instructionCode).array();
 					output.write(dataBuff);
