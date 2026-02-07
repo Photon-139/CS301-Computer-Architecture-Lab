@@ -1,7 +1,14 @@
 package generic;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 import processor.Clock;
 import processor.Processor;
+import processor.memorysystem.MainMemory;
+import processor.pipeline.RegisterFile;
 
 public class Simulator {
 		
@@ -28,6 +35,36 @@ public class Simulator {
 		 *     x1 = 65535
 		 *     x2 = 65535
 		 */
+		FileInputStream programFile = null;
+
+		try{
+			programFile = new FileInputStream(assemblyProgramFile);
+			int c;
+			int index = -1;
+			byte[] buffer = new byte[4];
+			
+			while((c=programFile.read(buffer))!=-1){
+				int dataInt = ByteBuffer.wrap(buffer).getInt();
+				if(index==-1){
+					processor.getRegisterFile().setProgramCounter(dataInt);
+				}else{
+					processor.getMainMemory().setWord(index, dataInt);
+				}
+				index++;
+				
+			}
+			processor.getRegisterFile().setValue(0, 0);
+			processor.getRegisterFile().setValue(1, 65535);
+			processor.getRegisterFile().setValue(2, 65535);
+
+			
+			processor.printState(0, 100);
+
+			programFile.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public static void simulate()
