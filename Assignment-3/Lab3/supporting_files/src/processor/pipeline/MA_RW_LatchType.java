@@ -1,8 +1,12 @@
 package processor.pipeline;
 
+import generic.Instruction;
+
 public class MA_RW_LatchType {
 	
 	boolean RW_enable;
+	int aluResult;
+	Instruction inst;
 	
 	public MA_RW_LatchType()
 	{
@@ -16,5 +20,16 @@ public class MA_RW_LatchType {
 	public void setRW_enable(boolean rW_enable) {
 		RW_enable = rW_enable;
 	}
-
+	public int getAluResult() {
+		return aluResult;
+	}
+	public void setAluResult(int aluResult) {
+		this.aluResult = aluResult;
+	}
+	public Instruction getInstruction() {
+		return inst;
+	}
+	public void setInstruction(Instruction inst) {
+		this.inst = inst;
+	}
 }

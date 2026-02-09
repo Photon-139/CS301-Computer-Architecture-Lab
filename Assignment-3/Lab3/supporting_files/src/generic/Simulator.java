@@ -3,12 +3,8 @@ package generic;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import processor.Clock;
 import processor.Processor;
-import processor.memorysystem.MainMemory;
-import processor.pipeline.RegisterFile;
 
 public class Simulator {
 		
@@ -56,10 +52,10 @@ public class Simulator {
 			processor.getRegisterFile().setValue(0, 0);
 			processor.getRegisterFile().setValue(1, 65535);
 			processor.getRegisterFile().setValue(2, 65535);
-
+			System.out.println(processor.getRegisterFile().getProgramCounter());
+			processor.printState(0, 50);
+			System.out.println("Read completed");
 			
-			processor.printState(0, 100);
-
 			programFile.close();
 
 		}catch(IOException e){

@@ -1,5 +1,7 @@
 package processor.pipeline;
 
+import generic.Instruction;
+import generic.Instruction.OperationType;
 import processor.Processor;
 
 public class MemoryAccess {
@@ -16,7 +18,32 @@ public class MemoryAccess {
 	
 	public void performMA()
 	{
+		Instruction inst = EX_MA_Latch.getInstruction();
+		int aluResult = EX_MA_Latch.getAluResult();
+		OperationType operationType = inst.getOperationType();
 		//TODO
+		if(EX_MA_Latch.isMA_enable()){
+			System.out.println("========\nMA Stage\nOperation type: "+operationType.toString());
+			if(operationType==OperationType.store){
+				int rs1 = containingProcessor.getRegisterFile().getValue(inst.getSourceOperand1().getValue());
+				// containingProcessor.getRegisterFile().setValue(rs1, containingProcessor.getMainMemory().getWord(aluResult));
+				containingProcessor.getMainMemory().setWord(aluResult, rs1);
+				System.out.println("rs1="+rs1+"\nvalue: "+containingProcessor.getMainMemory().getWord(aluResult));
+			}else{
+				if(operationType==OperationType.load){
+					MA_RW_Latch.setAluResult(containingProcessor.getMainMemory().getWord(aluResult));
+					System.out.println("Load instruction alu: "+MA_RW_Latch.getAluResult());
+				}else{
+					MA_RW_Latch.setAluResult(aluResult);
+				}
+			}
+			EX_MA_Latch.setMA_enable(false);
+			MA_RW_Latch.setRW_enable(true);
+			MA_RW_Latch.setInstruction(inst);
+			System.out.println("ALU Result set: "+MA_RW_Latch.getAluResult());
+
+
+		}
 	}
 
 }
