@@ -65,6 +65,8 @@ public class Simulator {
 	
 	public static void simulate()
 	{
+		Statistics.setNumberOfCycles(0);
+		Statistics.setNumberOfInstructions(0);
 		while(simulationComplete == false)
 		{
 			processor.getIFUnit().performIF();
@@ -77,6 +79,9 @@ public class Simulator {
 			Clock.incrementClock();
 			processor.getRWUnit().performRW();
 			Clock.incrementClock();
+			Statistics.setNumberOfCycles(Statistics.getNumberOfCycles()+1);
+			Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions()+1);
+
 		}
 		
 		// TODO
