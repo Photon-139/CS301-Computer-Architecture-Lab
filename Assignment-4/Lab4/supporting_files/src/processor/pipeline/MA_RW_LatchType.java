@@ -7,10 +7,12 @@ public class MA_RW_LatchType {
 	boolean RW_enable;
 	int aluResult;
 	Instruction inst;
+	boolean isNop;
 	
 	public MA_RW_LatchType()
 	{
 		RW_enable = false;
+		isNop = false;
 	}
 
 	public boolean isRW_enable() {
@@ -31,5 +33,11 @@ public class MA_RW_LatchType {
 	}
 	public void setInstruction(Instruction inst) {
 		this.inst = inst;
+	}
+	public boolean isNop(){
+		return isNop;
+	}
+	public void setNop(boolean status){
+		this.isNop = status;
 	}
 }

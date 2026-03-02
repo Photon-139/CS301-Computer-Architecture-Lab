@@ -29,11 +29,14 @@ public class InstructionFetch {
 			int currentPC = containingProcessor.getRegisterFile().getProgramCounter();
 			int newInstruction = containingProcessor.getMainMemory().getWord(currentPC);
 			IF_OF_Latch.setInstruction(newInstruction);
+			IF_OF_Latch.setInstructionPC(currentPC);
 			containingProcessor.getRegisterFile().setProgramCounter(currentPC + 1);
 			System.out.println("=======\nIF stage\nPC="+containingProcessor.getRegisterFile().getProgramCounter()+"\n"+"Instruction: "+newInstruction+"\n===========");
 			
-			IF_EnableLatch.setIF_enable(false);
+			// IF_EnableLatch.setIF_enable(false);
+			System.out.println("IF-OF latch enabled");
 			IF_OF_Latch.setOF_enable(true);
+			IF_OF_Latch.setNop(false);
 		}
 	}
 

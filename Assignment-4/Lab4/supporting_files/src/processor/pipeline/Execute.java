@@ -1,6 +1,7 @@
 package processor.pipeline;
 
 import generic.Instruction;
+import generic.Statistics;
 import processor.Processor;
 
 public class Execute {
@@ -20,9 +21,10 @@ public class Execute {
 	public void performEX()
 	{
 		//TODO
-		if(OF_EX_Latch.isEX_enable()){
+		boolean isBranchTaken = false; // Predict not taken
+		if(OF_EX_Latch.isEX_enable() && !OF_EX_Latch.isNop()){
 			Instruction inst = OF_EX_Latch.getInstruction();
-			int currentPC = containingProcessor.getRegisterFile().getProgramCounter() - 1;
+			int currentPC = inst.getProgramCounter();
 			int aluResult = -1;
 			int rs1 = -1, rs2 = -1, rd = -1;
 			System.out.println("========\nEX Stage\nOperation: "+inst.getOperationType().toString());
@@ -154,6 +156,7 @@ public class Execute {
 					rd = inst.getDestinationOperand().getValue();
 					aluResult = currentPC + rd;
 					EX_IF_Latch.setEX_IF_enable(true, aluResult);
+					isBranchTaken = true;
 					break;
 				case beq:
 					rs1 = containingProcessor.getRegisterFile().getValue(inst.getSourceOperand1().getValue());
@@ -162,6 +165,7 @@ public class Execute {
 					if(rs1==rs2){
 						aluResult = currentPC + rd;
 						EX_IF_Latch.setEX_IF_enable(true, aluResult);
+						isBranchTaken = true;
 					}
 					break;
 				case bne:
@@ -171,6 +175,8 @@ public class Execute {
 					if(rs1!=rs2){
 						aluResult = currentPC + rd;
 						EX_IF_Latch.setEX_IF_enable(true, aluResult);
+						isBranchTaken = true;
+
 					}
 					break;
 				case blt:
@@ -181,6 +187,8 @@ public class Execute {
 						aluResult = currentPC + rd;
 						System.out.println("Blt result: "+aluResult);
 						EX_IF_Latch.setEX_IF_enable(true, aluResult);
+						isBranchTaken = true;
+						System.out.println("Blt, PC = "+currentPC+" rd = "+rd);
 					}
 					break;
 				case bgt:
@@ -190,6 +198,8 @@ public class Execute {
 					if(rs1>rs2){
 						aluResult = currentPC + rd;
 						EX_IF_Latch.setEX_IF_enable(true, aluResult);
+						isBranchTaken = true;
+
 					}
 					break;
 				case end:
@@ -198,11 +208,21 @@ public class Execute {
 			System.out.println("ALU Result: "+aluResult);
 			System.out.println("rs="+rs1+"\nrs2="+rs2+"\nrd="+rd);
 			System.out.println("=======");
-			OF_EX_Latch.setEX_enable(false);
+			if(isBranchTaken){
+				containingProcessor.getConflictDetector().raiseControlConflict();
+				Statistics.setWrongPath_counter(Statistics.getWrongPath_counter()+1);
+			}
+			// OF_EX_Latch.setEX_enable(false);
+			System.out.println("EX-MA Latch enabled");
 			EX_MA_Latch.setMA_enable(true);
 			EX_MA_Latch.setAluResult(aluResult);
 			EX_MA_Latch.setInstruction(inst);
+			EX_MA_Latch.setNop(false);
+		}else if(OF_EX_Latch.isNop()){
+			System.out.println("EX Stage, NOP detected");
+			EX_MA_Latch.setNop(true);
 		}
+
 	}
 
 }

@@ -7,6 +7,8 @@ public class Statistics {
 	// TODO add your statistics here
 	static int numberOfInstructions;
 	static int numberOfCycles;
+	static int OF_stallCounter;
+	static int wrongPath_counter;
 	
 
 	public static void printStatistics(String statFile)
@@ -17,6 +19,8 @@ public class Statistics {
 			
 			writer.println("Number of instructions executed = " + numberOfInstructions);
 			writer.println("Number of cycles taken = " + numberOfCycles);
+			writer.println("Number of times OF stage was stalled = "+OF_stallCounter);
+			writer.println("Number of times an instruction on a wrong path entered the pipeline = "+wrongPath_counter);
 			
 			// TODO add code here to print statistics in the output file
 			
@@ -41,5 +45,18 @@ public class Statistics {
 	}
 	public static int getNumberOfInstructions() {
 		return numberOfInstructions;
+	}
+
+	public static void setOF_stallCounter(int oF_stallCounter) {
+		OF_stallCounter = oF_stallCounter;
+	}
+	public static void setWrongPath_counter(int wrongPath_counter) {
+		Statistics.wrongPath_counter = wrongPath_counter;
+	}
+	public static int getOF_stallCounter() {
+		return OF_stallCounter;
+	}
+	public static int getWrongPath_counter() {
+		return wrongPath_counter;
 	}
 }

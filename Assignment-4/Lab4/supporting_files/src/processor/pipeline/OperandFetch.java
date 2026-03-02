@@ -4,6 +4,7 @@ import generic.Instruction;
 import generic.Instruction.OperationType;
 import generic.Operand.OperandType;
 import generic.Operand;
+import generic.Statistics;
 import processor.Processor;
 
 public class OperandFetch {
@@ -23,7 +24,22 @@ public class OperandFetch {
 	
 	public void performOF()
 	{
-		if(IF_OF_Latch.isOF_enable())
+		if(OF_EX_Latch.isStalled()){
+			boolean stallStatus = containingProcessor.getConflictDetector().detectConflict();
+
+			if(!stallStatus){
+				OF_EX_Latch.setStallSignal(false);
+				containingProcessor.getConflictDetector().setIFStage(true);
+				OF_EX_Latch.setNop(false);
+				System.out.println("OF Stage, conflict from previous cycles resolved");
+			}else{
+				OF_EX_Latch.setNop(true);
+				System.out.println("OF Stage, Conflict from previous stages not resolved");
+				Statistics.setOF_stallCounter(Statistics.getOF_stallCounter()+1);
+			}
+			return;
+		}
+		if(IF_OF_Latch.isOF_enable() && !IF_OF_Latch.isNop())
 		{
 			//TODO
 
@@ -99,9 +115,33 @@ public class OperandFetch {
 			System.out.println("========");
 
 
+
+			instruction.setProgramCounter(IF_OF_Latch.getInstructionPC());
 			OF_EX_Latch.setInstruction(instruction);
-			IF_OF_Latch.setOF_enable(false);
+
+			boolean isThereConflict = containingProcessor.getConflictDetector().detectConflict();
+
+			if(isThereConflict){
+				OF_EX_Latch.setStallSignal(true);
+				containingProcessor.getConflictDetector().setIFStage(false);
+				OF_EX_Latch.setNop(true);
+				System.out.println("OF Stage, conflict detected after processing instruction");
+				Statistics.setOF_stallCounter(Statistics.getOF_stallCounter()+1);
+
+			}else{
+				OF_EX_Latch.setNop(false);
+			}
+
+			System.out.println("OF-EX latch enbaled");
 			OF_EX_Latch.setEX_enable(true);
+			// IF_OF_Latch.setOF_enable(false);
+
+			
+
+		}else if(IF_OF_Latch.isNop()){
+			System.out.println("OF Stage, NOP detected");
+				OF_EX_Latch.setNop(true);
+
 		}
 	}
 

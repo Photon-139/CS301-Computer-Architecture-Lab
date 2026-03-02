@@ -6,10 +6,15 @@ public class OF_EX_LatchType {
 	
 	boolean EX_enable;
 	Instruction inst;
+	boolean isStalled;
+	boolean isNop;
+
 	
 	public OF_EX_LatchType()
 	{
 		EX_enable = false;
+		isStalled = false;
+		isNop = false;
 	}
 
 	public boolean isEX_enable() {
@@ -25,6 +30,21 @@ public class OF_EX_LatchType {
 	}
 	public void setInstruction(Instruction in){
 		this.inst = in;
+	}
+
+	public boolean isStalled(){
+		return isStalled;
+	}
+	public void setStallSignal(boolean signal){
+		this.isStalled = signal;
+	}
+
+	public void setNop(boolean status){
+		this.isNop = status;
+	}
+
+	public boolean isNop(){
+		return isNop;
 	}
 
 }

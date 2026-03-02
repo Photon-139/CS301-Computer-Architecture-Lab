@@ -6,10 +6,12 @@ public class EX_MA_LatchType {
 	Instruction inst;
 	int aluResult;
 	boolean MA_enable;
+	boolean isNop;
 	
 	public EX_MA_LatchType()
 	{
 		MA_enable = false;
+		isNop = false;
 	}
 
 	public boolean isMA_enable() {
@@ -30,6 +32,12 @@ public class EX_MA_LatchType {
 	}
 	public int getAluResult() {
 		return aluResult;
+	}
+	public void setNop(boolean status){
+		this.isNop = status;
+	}
+	public boolean isNop(){
+		return isNop;
 	}
 
 }

@@ -2,6 +2,7 @@ package processor.pipeline;
 
 import generic.Instruction;
 import generic.Simulator;
+import generic.Instruction.OperationType;
 import processor.Processor;
 
 public class RegisterWrite {
@@ -18,7 +19,7 @@ public class RegisterWrite {
 	
 	public void performRW()
 	{
-		if(MA_RW_Latch.isRW_enable())
+		if(MA_RW_Latch.isRW_enable() && !MA_RW_Latch.isNop())
 		{
 			//TODO
 			
@@ -31,8 +32,11 @@ public class RegisterWrite {
 					System.out.println("Branching instruction");
 					break;
 				case end:
+					System.out.println("RW End PC: "+inst.getProgramCounter()+"\nGlobal PC: "+containingProcessor.getRegisterFile().getProgramCounter());
 					System.out.println("End instruction encounered");
 					Simulator.setSimulationComplete(true);
+					containingProcessor.getRegisterFile().setProgramCounter(inst.getProgramCounter()+1); // Bit of a hack but oh well
+					containingProcessor.getConflictDetector().endProgram();
 					break;
 				default:
 					containingProcessor.getRegisterFile().setValue(inst.getDestinationOperand().getValue(), aluResult);
@@ -41,8 +45,14 @@ public class RegisterWrite {
 			}
 			
 			System.out.println("=========");
-			MA_RW_Latch.setRW_enable(false);
-			IF_EnableLatch.setIF_enable(true);
+			// MA_RW_Latch.setRW_enable(false);
+			if(inst.getOperationType()!=OperationType.end && !containingProcessor.getConflictDetector().isStalled()){
+				IF_EnableLatch.setIF_enable(true);
+
+			}
+		}else if(MA_RW_Latch.isNop()){
+			System.out.println("RW Stage, NOP detected");
+			
 		}
 	}
 

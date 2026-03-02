@@ -67,6 +67,8 @@ public class Simulator {
 	{
 		Statistics.setNumberOfCycles(0);
 		Statistics.setNumberOfInstructions(0);
+		Statistics.setOF_stallCounter(0);
+		Statistics.setWrongPath_counter(0);
 		while(simulationComplete == false)
 		{
 			processor.getRWUnit().performRW();
