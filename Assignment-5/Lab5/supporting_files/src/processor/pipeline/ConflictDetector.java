@@ -95,7 +95,10 @@ public class ConflictDetector {
         EX_IF_Latch.setEX_IF_enable(false);
         EX_MA_Latch.setNop(false);
         MA_RW_Latch.setNop(false);
-
+        IF_EnableLatch.setIFBusy(false);
+        IF_OF_Latch.setOF_busy(false);
+        OF_EX_Latch.setEX_busy(false);
+        EX_MA_Latch.setMA_busy(false);
     }
 
 }

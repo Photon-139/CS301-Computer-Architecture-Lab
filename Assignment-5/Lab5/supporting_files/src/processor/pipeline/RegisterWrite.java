@@ -3,6 +3,7 @@ package processor.pipeline;
 import generic.Instruction;
 import generic.Simulator;
 import generic.Instruction.OperationType;
+import processor.Clock;
 import processor.Processor;
 
 public class RegisterWrite {
@@ -26,6 +27,7 @@ public class RegisterWrite {
 			// if instruction being processed is an end instruction, remember to call Simulator.setSimulationComplete(true);
 			Instruction inst = MA_RW_Latch.getInstruction();
 			int aluResult = MA_RW_Latch.getAluResult();
+			generic.Statistics.setNumberOfInstructions(generic.Statistics.getNumberOfInstructions() + 1);
 			System.out.println("=======\nRW Stage\nOperation Type: "+inst.getOperationType().toString());
 			switch (inst.getOperationType()) {
 				case bgt: case blt: case beq: case bne: case jmp: case store:
@@ -45,7 +47,7 @@ public class RegisterWrite {
 			}
 			
 			System.out.println("=========");
-			// MA_RW_Latch.setRW_enable(false);
+			MA_RW_Latch.setRW_enable(false);
 			if(inst.getOperationType()!=OperationType.end && !containingProcessor.getConflictDetector().isStalled()){
 				IF_EnableLatch.setIF_enable(true);
 

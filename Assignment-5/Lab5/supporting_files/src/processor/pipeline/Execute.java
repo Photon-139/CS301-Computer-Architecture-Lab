@@ -2,13 +2,20 @@ package processor.pipeline;
 
 import generic.Instruction;
 import generic.Statistics;
+import generic.Element;
+import generic.Event;
+import generic.ExecutionCompleteEvent;
+import generic.Simulator;
+import processor.Clock;
 import processor.Processor;
 
-public class Execute {
+public class Execute implements Element {
 	Processor containingProcessor;
 	OF_EX_LatchType OF_EX_Latch;
 	EX_MA_LatchType EX_MA_Latch;
 	EX_IF_LatchType EX_IF_Latch;
+	
+	boolean isALUBusy;
 	
 	public Execute(Processor containingProcessor, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, EX_IF_LatchType eX_IF_Latch)
 	{
@@ -20,6 +27,15 @@ public class Execute {
 	
 	public void performEX()
 	{
+
+		if(EX_MA_Latch.isMA_busy() || isALUBusy){
+			System.out.println("\n("+Clock.getCurrentTime()+") "+"MA Stage busy or EX busy, setting EX stage as busy\n");
+			
+			OF_EX_Latch.setEX_busy(true);
+			return;
+		} else {
+			OF_EX_Latch.setEX_busy(false);
+		}
 		//TODO
 		boolean isBranchTaken = false; // Predict not taken
 		if(OF_EX_Latch.isEX_enable() && !OF_EX_Latch.isNop()){
@@ -212,17 +228,57 @@ public class Execute {
 				containingProcessor.getConflictDetector().raiseControlConflict();
 				Statistics.setWrongPath_counter(Statistics.getWrongPath_counter()+1);
 			}
-			// OF_EX_Latch.setEX_enable(false);
-			System.out.println("EX-MA Latch enabled");
-			EX_MA_Latch.setMA_enable(true);
-			EX_MA_Latch.setAluResult(aluResult);
-			EX_MA_Latch.setInstruction(inst);
-			EX_MA_Latch.setNop(false);
+			
+			int latency = configuration.Configuration.ALU_latency;
+			switch(inst.getOperationType()) {
+				case mul: case muli:
+					latency = configuration.Configuration.multiplier_latency;
+					break;
+				case div: case divi:
+					latency = configuration.Configuration.divider_latency;
+					break;
+				default:
+					break;
+			}
+			
+			System.out.println("Scheduling ExecutionCompleteEvent with latency: " + latency);
+			Simulator.getEventQueue().addEvent(new ExecutionCompleteEvent(
+				Clock.getCurrentTime() + latency - 1,
+				this,
+				this,
+				aluResult,
+				inst,
+				isBranchTaken
+			));
+			
+			isALUBusy = true;
+			OF_EX_Latch.setEX_busy(true);
+			EX_MA_Latch.setNop(true);
+			OF_EX_Latch.setEX_enable(false);
+			
 		}else if(OF_EX_Latch.isNop()){
 			System.out.println("EX Stage, NOP detected");
 			EX_MA_Latch.setNop(true);
+			OF_EX_Latch.setEX_busy(false);
 		}
 
+	}
+
+	@Override
+	public void handleEvent(Event e) {
+		if (e.getEventType() == Event.EventType.ExecutionComplete) {
+			ExecutionCompleteEvent exeEvent = (ExecutionCompleteEvent) e;
+			
+			System.out.println("\nEX event handler\n" + Clock.getCurrentTime());
+			System.out.println("EX-MA Latch enabled");
+			EX_MA_Latch.setMA_enable(true);
+			EX_MA_Latch.setAluResult(exeEvent.getAluResult());
+			EX_MA_Latch.setInstruction(exeEvent.getInstruction());
+			EX_MA_Latch.setNop(false);
+			
+			isALUBusy = false;
+			OF_EX_Latch.setEX_busy(false);
+		}
 	}
 
 }

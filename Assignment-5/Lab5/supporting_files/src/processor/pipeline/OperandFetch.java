@@ -5,6 +5,7 @@ import generic.Instruction.OperationType;
 import generic.Operand.OperandType;
 import generic.Operand;
 import generic.Statistics;
+import processor.Clock;
 import processor.Processor;
 
 public class OperandFetch {
@@ -24,6 +25,14 @@ public class OperandFetch {
 	
 	public void performOF()
 	{
+		if(OF_EX_Latch.isEX_busy()){
+			System.out.println("\n("+Clock.getCurrentTime()+") "+"EX stage busy, setting OF stage busy\n");
+			IF_OF_Latch.setOF_busy(true);
+			return;
+		} else {
+			IF_OF_Latch.setOF_busy(false);
+		}
+
 		if(OF_EX_Latch.isStalled()){
 			boolean stallStatus = containingProcessor.getConflictDetector().detectConflict();
 
@@ -134,14 +143,16 @@ public class OperandFetch {
 
 			System.out.println("OF-EX latch enbaled");
 			OF_EX_Latch.setEX_enable(true);
-			// IF_OF_Latch.setOF_enable(false);
+			
+			IF_OF_Latch.setOF_busy(false);
+			IF_OF_Latch.setOF_enable(false);
 
 			
 
 		}else if(IF_OF_Latch.isNop()){
 			System.out.println("OF Stage, NOP detected");
-				OF_EX_Latch.setNop(true);
-
+			OF_EX_Latch.setNop(true);
+			IF_OF_Latch.setOF_busy(false);
 		}
 	}
 

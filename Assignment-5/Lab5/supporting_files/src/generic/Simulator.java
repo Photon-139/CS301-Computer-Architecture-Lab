@@ -10,6 +10,7 @@ public class Simulator {
 		
 	static Processor processor;
 	static boolean simulationComplete;
+	static EventQueue eventQueue;
 	
 	public static void setupSimulation(String assemblyProgramFile, Processor p)
 	{
@@ -17,6 +18,7 @@ public class Simulator {
 		loadProgram(assemblyProgramFile);
 		
 		simulationComplete = false;
+		eventQueue = new EventQueue();
 	}
 	
 	static void loadProgram(String assemblyProgramFile)
@@ -74,6 +76,7 @@ public class Simulator {
 			processor.getRWUnit().performRW();
 			processor.getMAUnit().performMA();
 			processor.getEXUnit().performEX();
+			eventQueue.processEvents();
 			processor.getOFUnit().performOF();
 			processor.getIFUnit().performIF();
 		
@@ -91,5 +94,8 @@ public class Simulator {
 	public static void setSimulationComplete(boolean value)
 	{
 		simulationComplete = value;
+	}
+	public static EventQueue getEventQueue(){
+		return eventQueue;
 	}
 }

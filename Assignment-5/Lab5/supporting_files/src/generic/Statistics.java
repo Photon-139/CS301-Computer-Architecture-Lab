@@ -21,6 +21,8 @@ public class Statistics {
 			writer.println("Number of cycles taken = " + numberOfCycles);
 			writer.println("Number of times OF stage was stalled = "+OF_stallCounter);
 			writer.println("Number of times an instruction on a wrong path entered the pipeline = "+wrongPath_counter);
+			double throughput = (double) numberOfInstructions / numberOfCycles;
+			writer.println("Throughput (instructions per cycle) = " + String.format("%.4f", throughput));
 			
 			// TODO add code here to print statistics in the output file
 			

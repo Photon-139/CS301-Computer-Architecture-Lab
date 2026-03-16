@@ -6,10 +6,13 @@ public class IF_OF_LatchType {
 	int instruction;
 	boolean isNop;
 	int instructionPC;
+	boolean isOF_busy;
 	
 	public IF_OF_LatchType()
 	{
 		OF_enable = false;
+		isNop = false;
+		isOF_busy = false;
 	}
 
 	public boolean isOF_enable() {
@@ -28,7 +31,7 @@ public class IF_OF_LatchType {
 		this.instruction = instruction;
 	}
 	public void setNop(boolean status){
-		isNop = status;
+		this.isNop = status;
 	}
 	public boolean isNop(){
 		return isNop;
@@ -38,6 +41,13 @@ public class IF_OF_LatchType {
 	}
 	public void setInstructionPC(int instructionPC) {
 		this.instructionPC = instructionPC;
+	}
+
+	public boolean isOF_busy(){
+		return isOF_busy;
+	}
+	public void setOF_busy(boolean signal){
+		this.isOF_busy = signal;
 	}
 
 }

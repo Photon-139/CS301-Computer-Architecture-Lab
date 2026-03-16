@@ -7,11 +7,13 @@ public class EX_MA_LatchType {
 	int aluResult;
 	boolean MA_enable;
 	boolean isNop;
+	boolean isMA_busy;
 	
 	public EX_MA_LatchType()
 	{
 		MA_enable = false;
 		isNop = false;
+		isMA_busy = false;
 	}
 
 	public boolean isMA_enable() {
@@ -38,6 +40,12 @@ public class EX_MA_LatchType {
 	}
 	public boolean isNop(){
 		return isNop;
+	}
+	public boolean isMA_busy(){
+		return isMA_busy;
+	}
+	public void setMA_busy(boolean signal){
+		this.isMA_busy = signal;
 	}
 
 }

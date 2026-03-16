@@ -8,6 +8,7 @@ public class OF_EX_LatchType {
 	Instruction inst;
 	boolean isStalled;
 	boolean isNop;
+	boolean isEX_busy;
 
 	
 	public OF_EX_LatchType()
@@ -15,6 +16,7 @@ public class OF_EX_LatchType {
 		EX_enable = false;
 		isStalled = false;
 		isNop = false;
+		isEX_busy = false;
 	}
 
 	public boolean isEX_enable() {
@@ -45,6 +47,12 @@ public class OF_EX_LatchType {
 
 	public boolean isNop(){
 		return isNop;
+	}
+	public boolean isEX_busy(){
+		return isEX_busy;
+	}
+	public void setEX_busy(boolean signal){
+		this.isEX_busy = signal;
 	}
 
 }
