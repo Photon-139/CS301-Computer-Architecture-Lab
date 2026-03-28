@@ -54,9 +54,9 @@ public class InstructionFetch implements Element {
 				System.out.println("("+Clock.getCurrentTime()+")"+"IF memory fetch added to queue. Current PC: "+currentPC);
 				
 				Simulator.getEventQueue().addEvent(new MemoryReadEvent(
-					Clock.getCurrentTime()+configuration.Configuration.mainMemoryLatency,
+					Clock.getCurrentTime()+configuration.Configuration.L1i_latency,
 					this, 
-					containingProcessor.getMainMemory(),
+					containingProcessor.getL1icache(),
 					currentPC
 				));
 				

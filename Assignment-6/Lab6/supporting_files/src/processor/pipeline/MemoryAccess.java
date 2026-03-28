@@ -14,8 +14,8 @@ import processor.Processor;
 
 public class MemoryAccess implements Element{
 	Processor containingProcessor;
-	EX_MA_LatchType EX_MA_Latch;
-	MA_RW_LatchType MA_RW_Latch;
+	public EX_MA_LatchType EX_MA_Latch;
+	public MA_RW_LatchType MA_RW_Latch;
 	
 	public MemoryAccess(Processor containingProcessor, EX_MA_LatchType eX_MA_Latch, MA_RW_LatchType mA_RW_Latch)
 	{
@@ -44,9 +44,9 @@ public class MemoryAccess implements Element{
 
 					// System.out.println("rs1="+rs1+"\nvalue: "+containingProcessor.getMainMemory().getWord(aluResult));
 					Simulator.getEventQueue().addEvent(new MemoryWriteEvent(
-						Clock.getCurrentTime()+configuration.Configuration.mainMemoryLatency,
+						Clock.getCurrentTime()+configuration.Configuration.L1d_latency,
 						this, 
-						containingProcessor.getMainMemory(), 
+						containingProcessor.getL1dcache(), 
 						aluResult, 
 						rs1
 					));
@@ -61,9 +61,9 @@ public class MemoryAccess implements Element{
 						// System.out.println("Load instruction alu: "+MA_RW_Latch.getAluResult());
 
 						Simulator.getEventQueue().addEvent(new MemoryReadEvent(
-							Clock.getCurrentTime()+configuration.Configuration.mainMemoryLatency,
+							Clock.getCurrentTime()+configuration.Configuration.L1d_latency,
 							this,
-							containingProcessor.getMainMemory(),
+							containingProcessor.getL1dcache(),
 							aluResult
 						));
 						EX_MA_Latch.setMA_busy(true);

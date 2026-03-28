@@ -1,6 +1,8 @@
 package processor;
 
 import processor.memorysystem.MainMemory;
+import configuration.Configuration;
+import processor.memorysystem.Cache;
 import processor.pipeline.ConflictDetector;
 import processor.pipeline.EX_IF_LatchType;
 import processor.pipeline.EX_MA_LatchType;
@@ -35,6 +37,8 @@ public class Processor {
 
 	//
 	ConflictDetector conflictDetector;
+	Cache L1iCache;
+	Cache L1dCache;
 	//
 	
 	public Processor()
@@ -56,8 +60,18 @@ public class Processor {
 		RWUnit = new RegisterWrite(this, MA_RW_Latch, IF_EnableLatch);
 
 		conflictDetector = new ConflictDetector(this, IF_EnableLatch, IF_OF_Latch, OF_EX_Latch, EX_MA_Latch, EX_IF_Latch, MA_RW_Latch);
+		
+		L1iCache = new Cache(this, Configuration.L1i_numberOfLines, Configuration.L1i_latency, Configuration.L1i_associativity);
+		L1dCache = new Cache(this, Configuration.L1d_numberOfLines, Configuration.L1d_latency, Configuration.L1d_associativity);
 	}
 	
+	public Cache getL1icache(){
+		return this.L1iCache;
+	}
+	public Cache getL1dcache(){
+		return this.L1dCache;
+	}
+
 	public void printState(int memoryStartingAddress, int memoryEndingAddress)
 	{
 		System.out.println(registerFile.getContentsAsString());
